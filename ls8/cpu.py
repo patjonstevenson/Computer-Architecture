@@ -7,7 +7,10 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [0] * 256
+        self.reg = [0] * 8
+        self.running = False
+        self.pc = 0
 
     def load(self):
         """Load a program into memory."""
@@ -60,6 +63,51 @@ class CPU:
 
         print()
 
+    # TODO
     def run(self):
         """Run the CPU."""
-        pass
+
+        instruction_map = {
+            0b10000010: 'LDI',
+            0b01000111: 'PRN',
+            0b00000001: 'HLT',
+            0b00000000: 0
+        }
+
+        self.running = True
+        pc = 0
+        while self.running:
+            cmd = self.ram_read(pc)
+            # print(f"CMD: {cmd}")
+            instruction = instruction_map[cmd]
+            if instruction == 'HLT':
+                self.running = False
+                pc += 1
+            elif instruction == 'PRN':
+                reg = self.ram_read(pc + 1)
+                data = self.ram_read(reg)
+                print(data)
+                pc += 2
+            elif instruction == 'LDI':
+                reg = self.ram_read(pc + 1)
+                data = self.ram_read(pc + 2)
+                self.ram_write(data, reg)
+                pc += 3
+            elif instruction == 0:
+                pc += 1
+                
+            
+            # if cmd == 0b01000111:
+
+            # elif cmd == 0b00000001:
+            #     self.running = False
+            #     pc += 1
+            
+
+    # TODO
+    def ram_read(self, addr):
+        return self.ram[addr]
+
+    # TODO
+    def ram_write(self, data, addr):
+        self.ram[addr] = data
