@@ -5,7 +5,12 @@
 import sys
 from cpu import *
 
-cpu = CPU()
+if __name__ == '__main__':
+    args = sys.argv
+    cpu = CPU()
+    if len(args) == 2:
+        cpu.load(args[1])
+    else:
+        cpu.load()
+    cpu.run()
 
-cpu.load()
-cpu.run()
