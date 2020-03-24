@@ -75,26 +75,26 @@ class CPU:
         }
 
         self.running = True
-        pc = 0
+        self.pc = 0
         while self.running:
-            cmd = self.ram_read(pc)
+            cmd = self.ram_read(self.pc)
             # print(f"CMD: {cmd}")
             instruction = instruction_map[cmd]
             if instruction == 'HLT':
                 self.running = False
-                pc += 1
+                self.pc += 1
             elif instruction == 'PRN':
-                reg = self.ram_read(pc + 1)
+                reg = self.ram_read(self.pc + 1)
                 data = self.ram_read(reg)
                 print(data)
-                pc += 2
+                self.pc += 2
             elif instruction == 'LDI':
-                reg = self.ram_read(pc + 1)
-                data = self.ram_read(pc + 2)
+                reg = self.ram_read(self.pc + 1)
+                data = self.ram_read(self.pc + 2)
                 self.ram_write(data, reg)
-                pc += 3
+                self.pc += 3
             elif instruction == 0:
-                pc += 1
+                self.pc += 1
                 
             
             # if cmd == 0b01000111:
