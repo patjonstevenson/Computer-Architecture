@@ -1,5 +1,5 @@
 """CPU functionality."""
-
+from dispatch_table import DispatchTable
 import sys
 from ast import literal_eval
 class CPU:
@@ -12,6 +12,15 @@ class CPU:
         self.running = False
         self.pc = 0
         self.program_file = None
+        self.dispatch_table = DispatchTable(self)
+
+    def increment(self, num=1):
+        for i in range(num):
+            self.pc += 1
+    
+    def decrement(self, num=1):
+        for i in range(num):
+            self.pc -= 1
 
     def load(self, file=None):
         """Load a program into memory."""
@@ -41,8 +50,8 @@ class CPU:
                 elif " " in f:
                     f = f[:f.find(" ")]
                 program.append(literal_eval('0b'+f))
-                print(f"INSTRUCTION: {program[:-1]}")
-            print(f"PROGRAM:\n{program}")
+            #     print(f"INSTRUCTION: {program[:-1]}")
+            # print(f"PROGRAM:\n{program}")
 
         for instruction in program:
             self.ram[address] = instruction
@@ -122,28 +131,29 @@ class CPU:
 
         while self.running:
             cmd = self.ram_read(self.pc)
-            instruction = instruction_map[cmd]
+            self.dispatch_table.execute(cmd)
+            # instruction = instruction_map[cmd]
 
-            if instruction == 'HLT':
-                self.running = False
-                self.pc += 1
-            elif instruction == 'PRN':
-                reg = self.ram_read(self.pc + 1)
-                data = self.ram_read(reg)
-                print(data)
-                self.pc += 2
-            elif instruction == 'LDI':
-                reg = self.ram_read(self.pc + 1)
-                data = self.ram_read(self.pc + 2)
-                self.ram_write(data, reg)
-                self.pc += 3
-            elif instruction in alu_ops:
-                reg_a = self.ram_read(self.pc + 1)
-                reg_b = self.ram_read(self.pc + 2)
-                self.alu(instruction, reg_a, reg_b)
-                self.pc += 3
-            elif instruction == 0:
-                self.pc += 1
+            # if instruction == 'HLT':
+            #     self.running = False
+            #     self.pc += 1
+            # elif instruction == 'PRN':
+            #     reg = self.ram_read(self.pc + 1)
+            #     data = self.ram_read(reg)
+            #     print(data)
+            #     self.pc += 2
+            # elif instruction == 'LDI':
+            #     reg = self.ram_read(self.pc + 1)
+            #     data = self.ram_read(self.pc + 2)
+            #     self.ram_write(data, reg)
+            #     self.pc += 3
+            # elif instruction in alu_ops:
+            #     reg_a = self.ram_read(self.pc + 1)
+            #     reg_b = self.ram_read(self.pc + 2)
+            #     self.alu(instruction, reg_a, reg_b)
+            #     self.pc += 3
+            # elif instruction == 0:
+            #     self.pc += 1
 
     def ram_read(self, addr):
         return self.ram[addr]
