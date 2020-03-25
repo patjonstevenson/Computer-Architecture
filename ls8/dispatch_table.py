@@ -29,19 +29,16 @@ class DispatchTable:
         reg = self.cpu.ram_read(self.cpu.pc + 1)
         data = self.cpu.ram_read(self.cpu.pc + 2)
         self.cpu.ram_write(data, reg)
-        # self.cpu.pc += 3
         self.cpu.increment(3)
     
     def prn(self):
         reg = self.cpu.ram_read(self.cpu.pc + 1)
         data = self.cpu.ram_read(reg)
         print(data)
-        # self.cpu.pc += 2
         self.cpu.increment(2)
     
     def hlt(self):
         self.cpu.running = False
-        # self.cpu.pc += 1
         self.cpu.increment()
 
     # ALU Operations
@@ -51,7 +48,6 @@ class DispatchTable:
         operand_a = self.cpu.ram_read(reg_a)
         operand_b = self.cpu.ram_read(reg_b)
         self.cpu.ram_write(operand_a + operand_b, reg_a)
-        # self.cpu.pc += 3
         self.cpu.increment(3)
 
     def sub(self):
@@ -60,7 +56,6 @@ class DispatchTable:
         operand_a = self.cpu.ram_read(reg_a)
         operand_b = self.cpu.ram_read(reg_b)
         self.cpu.ram_write(operand_a - operand_b, reg_a)
-        # self.cpu.pc += 3
         self.cpu.increment(3)
 
     def mul(self):
@@ -69,7 +64,6 @@ class DispatchTable:
         operand_a = self.cpu.ram_read(reg_a)
         operand_b = self.cpu.ram_read(reg_b)
         self.cpu.ram_write(operand_a * operand_b, reg_a)
-        # self.cpu.pc += 3
         self.cpu.increment(3)
 
     def div(self):
@@ -78,5 +72,4 @@ class DispatchTable:
         operand_a = self.cpu.ram_read(reg_a)
         operand_b = self.cpu.ram_read(reg_b)
         self.cpu.ram_write(operand_a/operand_b, reg_a)
-        # self.cpu.pc += 3
         self.cpu.increment(3)

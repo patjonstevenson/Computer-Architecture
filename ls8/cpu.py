@@ -132,29 +132,7 @@ class CPU:
         while self.running:
             cmd = self.ram_read(self.pc)
             self.dispatch_table.execute(cmd)
-            # instruction = instruction_map[cmd]
-
-            # if instruction == 'HLT':
-            #     self.running = False
-            #     self.pc += 1
-            # elif instruction == 'PRN':
-            #     reg = self.ram_read(self.pc + 1)
-            #     data = self.ram_read(reg)
-            #     print(data)
-            #     self.pc += 2
-            # elif instruction == 'LDI':
-            #     reg = self.ram_read(self.pc + 1)
-            #     data = self.ram_read(self.pc + 2)
-            #     self.ram_write(data, reg)
-            #     self.pc += 3
-            # elif instruction in alu_ops:
-            #     reg_a = self.ram_read(self.pc + 1)
-            #     reg_b = self.ram_read(self.pc + 2)
-            #     self.alu(instruction, reg_a, reg_b)
-            #     self.pc += 3
-            # elif instruction == 0:
-            #     self.pc += 1
-
+            
     def ram_read(self, addr):
         return self.ram[addr]
 
