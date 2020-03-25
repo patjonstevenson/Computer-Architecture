@@ -16,6 +16,9 @@ class DispatchTable:
             0b10000010: self.ldi,
             0b01000111: self.prn,
             0b00000001: self.hlt,
+
+            0b01000101: self.push,
+            0b01000110: self.pop
         }
 
     def execute(self, cmd):
@@ -26,50 +29,76 @@ class DispatchTable:
             instruction()
 
     def ldi(self):
-        reg = self.cpu.ram_read(self.cpu.pc + 1)
-        data = self.cpu.ram_read(self.cpu.pc + 2)
-        self.cpu.ram_write(data, reg)
-        self.cpu.increment(3)
+        pc = self.cpu.get_pc()
+        reg = self.cpu.ram_read(pc + 1)
+        data = self.cpu.ram_read(pc + 2)
+        self.cpu.reg_write(data, reg)
+        self.cpu.increment_pc(3)
     
     def prn(self):
-        reg = self.cpu.ram_read(self.cpu.pc + 1)
-        data = self.cpu.ram_read(reg)
+        pc = self.cpu.get_pc()
+        reg = self.cpu.ram_read(pc + 1)
+        data = self.cpu.reg_read(reg)
         print(data)
-        self.cpu.increment(2)
+        self.cpu.increment_pc(2)
     
     def hlt(self):
         self.cpu.running = False
-        self.cpu.increment()
+        self.cpu.increment_pc()
 
+    def push(self):
+        pc = self.cpu.get_pc()
+        reg = self.cpu.ram_read(pc + 1)
+        val = self.cpu.reg_read(reg)
+        self.cpu.decrement_sp(1)
+        # Copy the value in the given register to the address
+        #  pointed to by SP
+        sp = self.cpu.get_sp()
+        self.cpu.ram_write(val, sp)
+        self.cpu.increment_pc(2)
+        
+    def pop(self):
+        pc = self.cpu.get_pc()
+        sp = self.cpu.get_sp()
+        reg = self.cpu.ram_read(pc + 1)
+        stack_val = self.cpu.ram_read(sp)
+        self.cpu.increment_sp(1)
+        self.cpu.reg_write(stack_val, reg)
+        self.cpu.increment_pc(2)
+        
     # ALU Operations
     def add(self):
-        reg_a = self.cpu.ram_read(self.cpu.pc + 1)
-        reg_b = self.cpu.ram_read(self.cpu.pc + 2)
-        operand_a = self.cpu.ram_read(reg_a)
-        operand_b = self.cpu.ram_read(reg_b)
-        self.cpu.ram_write(operand_a + operand_b, reg_a)
-        self.cpu.increment(3)
+        pc = self.cpu.get_pc()
+        reg_a = self.cpu.ram_read(pc + 1)
+        reg_b = self.cpu.ram_read(pc + 2)
+        operand_a = self.cpu.reg_read(reg_a)
+        operand_b = self.cpu.reg_read(reg_b)
+        self.cpu.reg_write(operand_a + operand_b, reg_a)
+        self.cpu.increment_pc(3)
 
     def sub(self):
-        reg_a = self.cpu.ram_read(self.cpu.pc + 1)
-        reg_b = self.cpu.ram_read(self.cpu.pc + 2)
-        operand_a = self.cpu.ram_read(reg_a)
-        operand_b = self.cpu.ram_read(reg_b)
-        self.cpu.ram_write(operand_a - operand_b, reg_a)
-        self.cpu.increment(3)
+        pc = self.cpu.get_pc()
+        reg_a = self.cpu.ram_read(pc + 1)
+        reg_b = self.cpu.ram_read(pc + 2)
+        operand_a = self.cpu.reg_read(reg_a)
+        operand_b = self.cpu.reg_read(reg_b)
+        self.cpu.reg_write(operand_a - operand_b, reg_a)
+        self.cpu.increment_pc(3)
 
     def mul(self):
-        reg_a = self.cpu.ram_read(self.cpu.pc + 1)
-        reg_b = self.cpu.ram_read(self.cpu.pc + 2)
-        operand_a = self.cpu.ram_read(reg_a)
-        operand_b = self.cpu.ram_read(reg_b)
-        self.cpu.ram_write(operand_a * operand_b, reg_a)
-        self.cpu.increment(3)
+        pc = self.cpu.get_pc()
+        reg_a = self.cpu.ram_read(pc + 1)
+        reg_b = self.cpu.ram_read(pc + 2)
+        operand_a = self.cpu.reg_read(reg_a)
+        operand_b = self.cpu.reg_read(reg_b)
+        self.cpu.reg_write(operand_a * operand_b, reg_a)
+        self.cpu.increment_pc(3)
 
     def div(self):
-        reg_a = self.cpu.ram_read(self.cpu.pc + 1)
-        reg_b = self.cpu.ram_read(self.cpu.pc + 2)
-        operand_a = self.cpu.ram_read(reg_a)
-        operand_b = self.cpu.ram_read(reg_b)
-        self.cpu.ram_write(operand_a/operand_b, reg_a)
-        self.cpu.increment(3)
+        pc = self.cpu.get_pc()
+        reg_a = self.cpu.ram_read(pc + 1)
+        reg_b = self.cpu.ram_read(pc + 2)
+        operand_a = self.cpu.reg_read(reg_a)
+        operand_b = self.cpu.reg_read(reg_b)
+        self.cpu.reg_write(operand_a/operand_b, reg_a)
+        self.cpu.increment_pc(3)

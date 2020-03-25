@@ -8,19 +8,33 @@ class CPU:
     def __init__(self):
         """Construct a new CPU."""
         self.ram = [0] * 256
-        self.reg = [0] * 8
+        self.reg = [0, 0, 0, 0, 0, 0, 0, 255]
         self.running = False
         self.pc = 0
         self.program_file = None
         self.dispatch_table = DispatchTable(self)
 
-    def increment(self, num=1):
+    def get_pc(self):
+        return self.pc
+
+    def get_sp(self):
+        return self.reg[7]
+
+    def increment_pc(self, num=1):
         for i in range(num):
             self.pc += 1
     
-    def decrement(self, num=1):
+    def decrement_pc(self, num=1):
         for i in range(num):
             self.pc -= 1
+
+    def increment_sp(self, num=1):
+        for i in range(num):
+            self.reg[7] += 1
+    
+    def decrement_sp(self, num=1):
+        for i in range(num):
+            self.reg[7] -= 1
 
     def load(self, file=None):
         """Load a program into memory."""
@@ -102,30 +116,6 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-
-        # Translate binary instructions to text
-        instruction_map = {
-            # Other
-            0b10000010: 'LDI',
-            0b01000111: 'PRN',
-            0b00000001: 'HLT',
-            0b00000000: 0,
-
-            # ALU Operations
-            0b10100000: 'ADD',
-            0b10100001: 'SUB',
-            0b10100010: 'MUL',
-            0b10100011: 'DIV',
-        }
-
-        # List of operations to be handled by ALU
-        alu_ops = [
-            'ADD',
-            'SUB',
-            'MUL',
-            'DIV'
-        ]
-
         self.running = True
         self.pc = 0
 
@@ -138,3 +128,9 @@ class CPU:
 
     def ram_write(self, data, addr):
         self.ram[addr] = data
+
+    def reg_read(self, addr):
+        return self.reg[addr]
+
+    def reg_write(self, data, addr):
+        self.reg[addr] = data
