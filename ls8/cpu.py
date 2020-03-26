@@ -120,7 +120,6 @@ class CPU:
         self.pc = 0
 
         while self.running:
-            # print(f'PC AT BEGINNING OF LOOP: {self.pc}')
             cmd = self.ram_read(self.pc)
             self.dispatch_table.execute(cmd)
             

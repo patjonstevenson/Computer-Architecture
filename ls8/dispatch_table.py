@@ -68,46 +68,35 @@ class DispatchTable:
         
     def call(self):
         pc = self.cpu.get_pc()
-        sp = self.cpu.get_sp()
-
+        
         # Push return address to the stack
         self.cpu.decrement_sp()
+        sp = self.cpu.get_sp()
         self.cpu.ram_write(pc + 2, sp)
-        # print(f'CURRENT ({pc}): {self.cpu.ram_read(pc)}')
-        # print(f'NEXT ({pc+1}): {self.cpu.ram_read(pc+1)}')
-        # print(f'After NEXT ({pc+2}): {self.cpu.ram_read(pc+2)}')
         
         # Get the address of the subroutine
         reg = self.cpu.ram_read(pc + 1)
-        # print(f'Register containing subroutine address: {reg}')
         rout_addr = self.cpu.reg_read(reg)
-        # print(f'Subroutine Address: {rout_addr}')
+
+        # Set pc to address of subroutine
         diff = pc - rout_addr
-        # print(f'DIFF: {diff}')
         if diff > 0:
             self.cpu.decrement_pc(diff)
         elif diff < 0:
-            # print(f'PC before increment: {self.cpu.get_pc()}')
             self.cpu.increment_pc(abs(diff))
-            # print(f'PC after increment: {self.cpu.get_pc()}')
-
         else:
             raise ProcessLookupError(f'The subroutine at address {rout_addr} is the current address.')
         
     def ret(self):
-        # print("****RETURNING****")
         sp = self.cpu.get_sp()
-        ret_addr = self.cpu.ram_read(sp+1)
+        ret_addr = self.cpu.ram_read(sp)
         self.cpu.increment_sp()
         pc = self.cpu.get_pc()
         diff = pc - ret_addr
-        # print(f"RET ADDR IN RETURN: {ret_addr}")
         if diff > 0:
             self.cpu.decrement_pc(diff)
         elif diff < 0:
             self.cpu.increment_pc(abs(diff))
-        # print(f"PC AFTER RETURN: {self.cpu.get_pc()}")
-
 
     # ALU Operations
     def add(self):
