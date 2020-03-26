@@ -18,7 +18,9 @@ class DispatchTable:
             0b00000001: self.hlt,
 
             0b01000101: self.push,
-            0b01000110: self.pop
+            0b01000110: self.pop,
+            0b01010000: self.call,
+            0b00010001: self.ret
         }
 
     def execute(self, cmd):
@@ -51,8 +53,6 @@ class DispatchTable:
         reg = self.cpu.ram_read(pc + 1)
         val = self.cpu.reg_read(reg)
         self.cpu.decrement_sp(1)
-        # Copy the value in the given register to the address
-        #  pointed to by SP
         sp = self.cpu.get_sp()
         self.cpu.ram_write(val, sp)
         self.cpu.increment_pc(2)
@@ -66,6 +66,49 @@ class DispatchTable:
         self.cpu.reg_write(stack_val, reg)
         self.cpu.increment_pc(2)
         
+    def call(self):
+        pc = self.cpu.get_pc()
+        sp = self.cpu.get_sp()
+
+        # Push return address to the stack
+        self.cpu.decrement_sp()
+        self.cpu.ram_write(pc + 2, sp)
+        # print(f'CURRENT ({pc}): {self.cpu.ram_read(pc)}')
+        # print(f'NEXT ({pc+1}): {self.cpu.ram_read(pc+1)}')
+        # print(f'After NEXT ({pc+2}): {self.cpu.ram_read(pc+2)}')
+        
+        # Get the address of the subroutine
+        reg = self.cpu.ram_read(pc + 1)
+        # print(f'Register containing subroutine address: {reg}')
+        rout_addr = self.cpu.reg_read(reg)
+        # print(f'Subroutine Address: {rout_addr}')
+        diff = pc - rout_addr
+        # print(f'DIFF: {diff}')
+        if diff > 0:
+            self.cpu.decrement_pc(diff)
+        elif diff < 0:
+            # print(f'PC before increment: {self.cpu.get_pc()}')
+            self.cpu.increment_pc(abs(diff))
+            # print(f'PC after increment: {self.cpu.get_pc()}')
+
+        else:
+            raise ProcessLookupError(f'The subroutine at address {rout_addr} is the current address.')
+        
+    def ret(self):
+        # print("****RETURNING****")
+        sp = self.cpu.get_sp()
+        ret_addr = self.cpu.ram_read(sp+1)
+        self.cpu.increment_sp()
+        pc = self.cpu.get_pc()
+        diff = pc - ret_addr
+        # print(f"RET ADDR IN RETURN: {ret_addr}")
+        if diff > 0:
+            self.cpu.decrement_pc(diff)
+        elif diff < 0:
+            self.cpu.increment_pc(abs(diff))
+        # print(f"PC AFTER RETURN: {self.cpu.get_pc()}")
+
+
     # ALU Operations
     def add(self):
         pc = self.cpu.get_pc()
